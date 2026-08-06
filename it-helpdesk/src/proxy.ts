@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
 const AUTH_PAGES = ["/login", "/register"];
-const PROTECTED_PREFIXES = ["/dashboard", "/tickets", "/staff"];
+const PROTECTED_PREFIXES = ["/dashboard", "/tickets", "/staff", "/admin"];
 const STAFF_ROLES = ["IT_STAFF", "ADMIN"];
 
 export default auth((req) => {
@@ -26,6 +26,14 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
+  if (
+    isAuthed &&
+    pathname.startsWith("/admin") &&
+    req.auth!.user.role !== "ADMIN"
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  }
+
   if (isAuthed && AUTH_PAGES.includes(pathname)) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
@@ -38,6 +46,7 @@ export const config = {
     "/dashboard/:path*",
     "/tickets/:path*",
     "/staff/:path*",
+    "/admin/:path*",
     "/login",
     "/register",
   ],
