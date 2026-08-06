@@ -33,7 +33,7 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Link
           href="/tickets"
           className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
@@ -46,6 +46,14 @@ export default async function DashboardPage() {
         >
           แจ้งปัญหาใหม่
         </Link>
+        {(user?.role === "IT_STAFF" || user?.role === "ADMIN") && (
+          <Link
+            href="/staff/tickets"
+            className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+          >
+            Ticket ทั้งหมด (Staff)
+          </Link>
+        )}
       </div>
 
       <form
