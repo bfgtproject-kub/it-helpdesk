@@ -31,6 +31,7 @@ export default async function StaffTicketDetailPage(
     include: {
       createdBy: { select: { name: true, email: true } },
       assignedTo: { select: { name: true } },
+      category: true,
     },
   });
 
@@ -55,6 +56,10 @@ export default async function StaffTicketDetailPage(
         <p>
           <span className="text-zinc-500">ความรุนแรง: </span>
           {SEVERITY_LABEL[ticket.severity]}
+        </p>
+        <p>
+          <span className="text-zinc-500">หมวดหมู่: </span>
+          {ticket.category?.name ?? "รอ AI จัดหมวดหมู่"}
         </p>
         <p>
           <span className="text-zinc-500">ผู้รับผิดชอบ: </span>

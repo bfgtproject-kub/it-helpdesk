@@ -21,6 +21,7 @@ export default async function TicketsPage() {
   const tickets = await prisma.ticket.findMany({
     where: { createdById: session!.user.id },
     orderBy: { createdAt: "desc" },
+    include: { category: true },
   });
 
   return (
@@ -49,9 +50,10 @@ export default async function TicketsPage() {
                 className="flex flex-col gap-1 rounded-md border border-zinc-200 p-4 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
               >
                 <span className="font-medium">{ticket.title}</span>
-                <span className="flex gap-3 text-zinc-500">
+                <span className="flex flex-wrap gap-3 text-zinc-500">
                   <span>สถานะ: {STATUS_LABEL[ticket.status]}</span>
                   <span>ความรุนแรง: {SEVERITY_LABEL[ticket.severity]}</span>
+                  {ticket.category && <span>หมวดหมู่: {ticket.category.name}</span>}
                 </span>
                 <span className="text-xs text-zinc-400">
                   แจ้งเมื่อ {ticket.createdAt.toLocaleString("th-TH")}

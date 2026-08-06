@@ -23,7 +23,10 @@ export default async function TicketDetailPage(
   const { id } = await props.params;
   const session = await auth();
 
-  const ticket = await prisma.ticket.findUnique({ where: { id } });
+  const ticket = await prisma.ticket.findUnique({
+    where: { id },
+    include: { category: true },
+  });
 
   if (!ticket) notFound();
   if (ticket.createdById !== session?.user.id) redirect("/tickets");
@@ -44,6 +47,11 @@ export default async function TicketDetailPage(
         <span className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
           ความรุนแรง: {SEVERITY_LABEL[ticket.severity]}
         </span>
+        {ticket.category && (
+          <span className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+            หมวดหมู่: {ticket.category.name}
+          </span>
+        )}
       </div>
 
       <p className="whitespace-pre-wrap text-sm">{ticket.description}</p>

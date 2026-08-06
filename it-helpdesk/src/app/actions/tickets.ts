@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { classifyAndUpdateTicket } from "@/lib/ticket-classifier";
 
 export type TicketFormState = { error?: string } | undefined;
 
@@ -32,6 +33,8 @@ export async function createTicket(
       createdById: session.user.id,
     },
   });
+
+  await classifyAndUpdateTicket(ticket.id, title, description);
 
   redirect(`/tickets/${ticket.id}`);
 }

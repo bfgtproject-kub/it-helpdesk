@@ -32,6 +32,7 @@ export default async function StaffTicketsPage() {
     include: {
       createdBy: { select: { name: true, email: true } },
       assignedTo: { select: { name: true } },
+      category: true,
     },
   });
 
@@ -61,6 +62,7 @@ export default async function StaffTicketsPage() {
                 <span className="flex flex-wrap gap-3 text-zinc-500">
                   <span>สถานะ: {STATUS_LABEL[ticket.status]}</span>
                   <span>ความรุนแรง: {SEVERITY_LABEL[ticket.severity]}</span>
+                  {ticket.category && <span>หมวดหมู่: {ticket.category.name}</span>}
                   <span>
                     ผู้รับผิดชอบ: {ticket.assignedTo?.name ?? "ยังไม่มีผู้รับงาน"}
                   </span>
