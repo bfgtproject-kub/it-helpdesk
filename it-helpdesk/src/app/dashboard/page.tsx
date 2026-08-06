@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth, signOut } from "@/auth";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -30,6 +31,21 @@ export default async function DashboardPage() {
           <span className="text-zinc-500">สิทธิ์: </span>
           {user?.role ? ROLE_LABEL[user.role] : "-"}
         </p>
+      </div>
+
+      <div className="flex gap-3">
+        <Link
+          href="/tickets"
+          className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+        >
+          ตั๋วของฉัน
+        </Link>
+        <Link
+          href="/tickets/new"
+          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+        >
+          แจ้งปัญหาใหม่
+        </Link>
       </div>
 
       <form
