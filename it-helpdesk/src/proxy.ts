@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
 const AUTH_PAGES = ["/login", "/register"];
-const PROTECTED_PREFIXES = ["/dashboard", "/tickets", "/staff", "/admin"];
+const PROTECTED_PREFIXES = ["/dashboard", "/tickets", "/staff", "/admin", "/assets"];
 const STAFF_ROLES = ["IT_STAFF", "ADMIN"];
 
 export default auth((req) => {
@@ -47,6 +47,7 @@ export const config = {
     "/tickets/:path*",
     "/staff/:path*",
     "/admin/:path*",
+    "/assets/:path*",
     "/login",
     "/register",
   ],
