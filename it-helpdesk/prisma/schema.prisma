@@ -11,3 +11,128 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Role {
+  USER
+  IT_STAFF
+  ADMIN
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketSeverity {
+  PENDING_REVIEW // ค่า fallback เมื่อ AI จัดหมวดหมู่ไม่ได้ (Phase 2)
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AssetStatus {
+  AVAILABLE
+  LOANED
+  MAINTENANCE
+  RETIRED
+}
+
+enum LoanStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+}
+
+model User {
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(USER)
+
+  createdTickets  Ticket[]        @relation("TicketCreatedBy")
+  assignedTickets Ticket[]        @relation("TicketAssignedTo")
+  ticketComments  TicketComment[]
+  assetLoans      AssetLoan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+
+  tickets Ticket[]
+  assets  Asset[]
+}
+
+model Ticket {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  status      TicketStatus   @default(OPEN)
+  severity    TicketSeverity @default(PENDING_REVIEW)
+  resolution  String?
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  createdBy   User   @relation("TicketCreatedBy", fields: [createdById], references: [id])
+  createdById String
+
+  assignedTo   User?   @relation("TicketAssignedTo", fields: [assignedToId], references: [id])
+  assignedToId String?
+
+  comments TicketComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TicketComment {
+  id      String @id @default(cuid())
+  message String
+
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  createdAt DateTime @default(now())
+}
+
+model Asset {
+  id           String      @id @default(cuid())
+  assetTag     String      @unique
+  name         String
+  status       AssetStatus @default(AVAILABLE)
+  purchaseDate DateTime?
+  qrCodeUrl    String?
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  loans AssetLoan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AssetLoan {
+  id     String     @id @default(cuid())
+  status LoanStatus @default(BORROWED)
+
+  asset   Asset  @relation(fields: [assetId], references: [id])
+  assetId String
+
+  borrower   User   @relation(fields: [borrowerId], references: [id])
+  borrowerId String
+
+  borrowedAt DateTime  @default(now())
+  dueAt      DateTime?
+  returnedAt DateTime?
+}
