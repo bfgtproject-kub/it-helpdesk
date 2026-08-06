@@ -38,7 +38,7 @@ export async function createAsset(
     return { error: "รหัสครุภัณฑ์นี้มีอยู่แล้ว" };
   }
 
-  await prisma.asset.create({
+  const asset = await prisma.asset.create({
     data: {
       assetTag,
       name,
@@ -47,7 +47,9 @@ export async function createAsset(
   });
 
   revalidatePath("/admin/assets");
-  redirect("/admin/assets");
+  // Land on the edit page (not the list) so the admin sees the generated
+  // QR code immediately, ready to print/download.
+  redirect(`/admin/assets/${asset.id}/edit`);
 }
 
 export async function updateAsset(
