@@ -1,13 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { MessageCirclePlus } from "lucide-react";
 import { createFaqEntry } from "@/app/actions/admin-faq";
 import FadeIn from "@/components/FadeIn";
 
 export default function NewFaqPage() {
-  const [state, action, pending] = useActionState(createFaqEntry, undefined);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  // Not <form action={...}> — React 19 resets form fields back to empty
+  // after a Server Action completes, even on a validation error, which
+  // wiped whatever the user had just typed. Calling the action directly
+  // keeps the fields in local state so a failed submit doesn't lose input.
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("question", question);
+      formData.set("answer", answer);
+      const result = await createFaqEntry(undefined, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
@@ -21,22 +43,26 @@ export default function NewFaqPage() {
       </FadeIn>
 
       <FadeIn delay={0.05}>
-        <form action={action} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             name="question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
             placeholder="คำถาม เช่น รีเซ็ตรหัสผ่านต้องทำอย่างไร"
             required
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           />
           <textarea
             name="answer"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
             placeholder="คำตอบ"
             required
             rows={6}
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           />
 
-          {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"

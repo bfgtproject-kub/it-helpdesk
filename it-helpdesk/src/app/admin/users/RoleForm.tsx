@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useRef } from "react";
-import { updateUserRole, type UpdateRoleState } from "@/app/actions/admin-users";
+import { useState, useTransition, type ChangeEvent } from "react";
+import { updateUserRole } from "@/app/actions/admin-users";
 
 const ROLE_OPTIONS = [
   { value: "USER", label: "ผู้ใช้งานทั่วไป" },
@@ -18,20 +18,43 @@ export default function RoleForm({
   currentRole: string;
   disabled?: boolean;
 }) {
-  const updateWithId = updateUserRole.bind(null, userId);
-  const [state, action, pending] = useActionState<UpdateRoleState, FormData>(
-    updateWithId,
-    undefined
-  );
-  const formRef = useRef<HTMLFormElement>(null);
+  const [role, setRole] = useState(currentRole);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  // Deliberately not a <form action={...}> — React 19 resets uncontrolled
+  // (and even controlled, since the reset happens outside React's own
+  // commit cycle) form fields back to their pre-submit value once a form
+  // action completes. Calling the server action directly, the same way
+  // askChatbot/scanAssetLabel do elsewhere in this app, sidesteps that
+  // native-form-submission machinery entirely.
+  function handleChange(e: ChangeEvent<HTMLSelectElement>) {
+    const newRole = e.target.value;
+    setRole(newRole);
+    setError(null);
+    setSuccess(false);
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("role", newRole);
+      const result = await updateUserRole(userId, undefined, formData);
+      if (result?.error) {
+        setError(result.error);
+        setRole(currentRole);
+        return;
+      }
+      setSuccess(true);
+    });
+  }
 
   return (
-    <form ref={formRef} action={action} className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1">
       <select
         name="role"
-        defaultValue={currentRole}
+        value={role}
         disabled={disabled || pending}
-        onChange={() => formRef.current?.requestSubmit()}
+        onChange={handleChange}
         className="rounded-lg border border-gold/25 bg-background px-2 py-1 text-sm text-foreground outline-none transition focus:border-gold disabled:opacity-50"
       >
         {ROLE_OPTIONS.map((opt) => (
@@ -42,8 +65,8 @@ export default function RoleForm({
       </select>
       {disabled && <span className="text-xs text-muted">บัญชีของคุณเอง</span>}
       {pending && <span className="text-xs text-muted">กำลังบันทึก...</span>}
-      {state?.success && <span className="text-xs text-green-600">บันทึกแล้ว</span>}
-      {state?.error && <span className="text-xs text-red-600">{state.error}</span>}
-    </form>
+      {success && <span className="text-xs text-green-600">บันทึกแล้ว</span>}
+      {error && <span className="text-xs text-red-600">{error}</span>}
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useActionState, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import gsap from "gsap";
@@ -14,9 +14,31 @@ if (typeof window !== "undefined") {
 }
 
 function LoginForm() {
-  const [state, action, pending] = useActionState(login, undefined);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "1";
+
+  // Not <form action={...}> — React 19 resets form fields after a Server
+  // Action completes, even on a validation error, which wiped the email
+  // the user had just typed on a failed login. Calling the action
+  // directly keeps fields in local state.
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("email", email);
+      formData.set("password", password);
+      const result = await login(undefined, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <>
@@ -26,10 +48,12 @@ function LoginForm() {
         </p>
       )}
 
-      <form action={action} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           name="email"
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="อีเมล"
           autoComplete="email"
           required
@@ -38,18 +62,20 @@ function LoginForm() {
         <input
           name="password"
           type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="รหัสผ่าน"
           autoComplete="current-password"
           required
           className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
         />
 
-        {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"
           disabled={pending}
-          className="mt-2 rounded-full bg-gold px-3 py-2.5 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+          className="mt-2 rounded-full bg-gold-deep px-3 py-2.5 text-sm font-medium text-white transition-[filter] duration-150 hover:brightness-110 disabled:opacity-50"
         >
           {pending ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
         </button>

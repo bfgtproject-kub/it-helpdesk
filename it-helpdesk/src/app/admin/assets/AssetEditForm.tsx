@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { Save, Trash2 } from "lucide-react";
-import { updateAsset, deleteAsset, type AssetFormState } from "@/app/actions/admin-assets";
+import { updateAsset, deleteAsset } from "@/app/actions/admin-assets";
 
 const STATUS_OPTIONS = [
   { value: "AVAILABLE", label: "พร้อมใช้งาน" },
@@ -22,19 +22,40 @@ export default function AssetEditForm({
   currentStatus: string;
   currentPurchaseDate: string;
 }) {
-  const updateWithId = updateAsset.bind(null, assetId);
-  const [state, action, pending] = useActionState<AssetFormState, FormData>(
-    updateWithId,
-    undefined
-  );
+  const [name, setName] = useState(currentName);
+  const [status, setStatus] = useState(currentStatus);
+  const [purchaseDate, setPurchaseDate] = useState(currentPurchaseDate);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const deleteWithId = deleteAsset.bind(null, assetId);
+
+  // Not <form action={...}> — React 19 resets form fields after a Server
+  // Action completes, even on a validation error, which wiped whatever the
+  // admin had just edited. Calling the action directly keeps the fields in
+  // local state so a failed save doesn't lose the edit.
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("name", name);
+      formData.set("status", status);
+      formData.set("purchaseDate", purchaseDate);
+      const result = await updateAsset(assetId, undefined, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <form action={action} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           name="name"
-          defaultValue={currentName}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
           className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
         />
@@ -43,7 +64,8 @@ export default function AssetEditForm({
           <span className="text-muted">สถานะ</span>
           <select
             name="status"
-            defaultValue={currentStatus}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           >
             {STATUS_OPTIONS.map((opt) => (
@@ -59,12 +81,13 @@ export default function AssetEditForm({
           <input
             name="purchaseDate"
             type="date"
-            defaultValue={currentPurchaseDate}
+            value={purchaseDate}
+            onChange={(e) => setPurchaseDate(e.target.value)}
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           />
         </label>
 
-        {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"

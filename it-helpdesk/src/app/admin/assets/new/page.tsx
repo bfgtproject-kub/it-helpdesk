@@ -1,13 +1,38 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { PackagePlus } from "lucide-react";
 import { createAsset } from "@/app/actions/admin-assets";
 import FadeIn from "@/components/FadeIn";
 
 export default function NewAssetPage() {
-  const [state, action, pending] = useActionState(createAsset, undefined);
+  const [assetTag, setAssetTag] = useState("");
+  const [name, setName] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  // Not <form action={...}> — React 19 resets form fields back to empty
+  // after a Server Action completes, even on a validation error, which
+  // wiped whatever the user had just typed. Calling the action directly
+  // keeps the fields in local state so a failed submit (e.g. duplicate
+  // asset tag) doesn't lose the user's input.
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("assetTag", assetTag);
+      formData.set("name", name);
+      formData.set("purchaseDate", purchaseDate);
+      const result = await createAsset(undefined, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4">
@@ -19,15 +44,19 @@ export default function NewAssetPage() {
       </FadeIn>
 
       <FadeIn delay={0.05}>
-        <form action={action} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             name="assetTag"
+            value={assetTag}
+            onChange={(e) => setAssetTag(e.target.value)}
             placeholder="รหัสครุภัณฑ์ เช่น NB-2026-001"
             required
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           />
           <input
             name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="ชื่อทรัพย์สิน เช่น Notebook Dell Latitude"
             required
             className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
@@ -37,11 +66,13 @@ export default function NewAssetPage() {
             <input
               name="purchaseDate"
               type="date"
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
               className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
             />
           </label>
 
-          {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
