@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import FadeIn from "@/components/FadeIn";
 
 const STATUS_LABEL: Record<string, string> = {
   OPEN: "รอดำเนินการ",
@@ -33,41 +34,43 @@ export default async function TicketDetailPage(
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
-      <div>
-        <Link href="/tickets" className="text-sm text-zinc-500 underline">
+      <FadeIn>
+        <Link href="/tickets" className="text-sm text-muted underline">
           &larr; ตั๋วของฉัน
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold">{ticket.title}</h1>
-      </div>
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-foreground">{ticket.title}</h1>
+      </FadeIn>
 
-      <div className="flex gap-3 text-sm">
-        <span className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+      <FadeIn delay={0.05} className="flex gap-3 text-sm">
+        <span className="rounded-full bg-gold-wash px-3 py-1 text-foreground">
           สถานะ: {STATUS_LABEL[ticket.status]}
         </span>
-        <span className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+        <span className="rounded-full bg-gold-wash px-3 py-1 text-foreground">
           ความรุนแรง: {SEVERITY_LABEL[ticket.severity]}
         </span>
         {ticket.category && (
-          <span className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+          <span className="rounded-full bg-gold-wash px-3 py-1 text-foreground">
             หมวดหมู่: {ticket.category.name}
           </span>
         )}
-      </div>
+      </FadeIn>
 
-      <p className="whitespace-pre-wrap text-sm">{ticket.description}</p>
+      <FadeIn delay={0.1}>
+        <p className="whitespace-pre-wrap text-sm text-foreground">{ticket.description}</p>
 
-      {ticket.resolution && (
-        <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm dark:border-green-900 dark:bg-green-950">
-          <p className="font-medium text-green-700 dark:text-green-400">
-            วิธีแก้ไข
-          </p>
-          <p className="mt-1 whitespace-pre-wrap">{ticket.resolution}</p>
-        </div>
-      )}
+        {ticket.resolution && (
+          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm dark:border-green-900 dark:bg-green-950">
+            <p className="font-medium text-green-700 dark:text-green-400">
+              วิธีแก้ไข
+            </p>
+            <p className="mt-1 whitespace-pre-wrap">{ticket.resolution}</p>
+          </div>
+        )}
 
-      <p className="text-xs text-zinc-400">
-        แจ้งเมื่อ {ticket.createdAt.toLocaleString("th-TH")}
-      </p>
+        <p className="mt-4 text-xs text-muted">
+          แจ้งเมื่อ {ticket.createdAt.toLocaleString("th-TH")}
+        </p>
+      </FadeIn>
     </main>
   );
 }

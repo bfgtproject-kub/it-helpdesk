@@ -34,12 +34,12 @@ export default function UpdateTicketForm({
   return (
     <form action={action} className="flex flex-col gap-3">
       <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-500">สถานะ</span>
+        <span className="text-muted">สถานะ</span>
         <select
           name="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -50,14 +50,14 @@ export default function UpdateTicketForm({
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-500">วิธีแก้ไข</span>
+        <span className="text-muted">วิธีแก้ไข</span>
         <textarea
           name="resolution"
           value={resolution}
           onChange={(e) => setResolution(e.target.value)}
           rows={4}
           placeholder="บันทึกวิธีแก้ไขปัญหา"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
         />
       </label>
 
@@ -69,7 +69,7 @@ export default function UpdateTicketForm({
       <button
         type="submit"
         disabled={pending}
-        className="w-fit rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="w-fit rounded-full bg-gold px-3 py-2 text-sm font-medium text-white transition-[filter] duration-150 hover:brightness-110 disabled:opacity-50"
       >
         {pending ? "กำลังบันทึก..." : "บันทึก"}
       </button>
