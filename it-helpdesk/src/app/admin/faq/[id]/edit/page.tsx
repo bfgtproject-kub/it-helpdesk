@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
+import FadeIn from "@/components/FadeIn";
 import FaqEditForm from "../../FaqEditForm";
 
 export default async function EditFaqPage(
@@ -19,18 +20,20 @@ export default async function EditFaqPage(
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
-      <div>
-        <Link href="/admin/faq" className="text-sm text-zinc-500 underline">
+      <FadeIn>
+        <Link href="/admin/faq" className="text-sm text-muted underline">
           &larr; ฐานความรู้ทั้งหมด
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold">แก้ไขคำถาม</h1>
-      </div>
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-foreground">แก้ไขคำถาม</h1>
+      </FadeIn>
 
-      <FaqEditForm
-        faqId={faq.id}
-        currentQuestion={faq.question}
-        currentAnswer={faq.answer}
-      />
+      <FadeIn delay={0.05}>
+        <FaqEditForm
+          faqId={faq.id}
+          currentQuestion={faq.question}
+          currentAnswer={faq.answer}
+        />
+      </FadeIn>
     </main>
   );
 }
