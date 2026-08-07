@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Sparkles } from "lucide-react";
 import { generateTrendSummary } from "@/app/actions/trend-summary";
 
 export default function TrendSummaryButton() {
@@ -28,14 +29,15 @@ export default function TrendSummaryButton() {
         type="button"
         onClick={handleClick}
         disabled={pending}
-        className="w-fit rounded-full border border-gold/40 px-3 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash disabled:opacity-50"
+        className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/40 px-3 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash disabled:opacity-50"
       >
+        <Sparkles className="h-4 w-4 text-gold" aria-hidden="true" />
         {pending ? "กำลังสรุป..." : "สร้างสรุป AI"}
       </button>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       {summary && (
-        <p className="whitespace-pre-wrap text-sm text-foreground">{summary}</p>
+        <p className="text-pretty whitespace-pre-wrap text-sm text-foreground">{summary}</p>
       )}
     </div>
   );

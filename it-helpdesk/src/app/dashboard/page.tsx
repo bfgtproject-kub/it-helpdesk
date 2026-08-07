@@ -1,10 +1,25 @@
 import Link from "next/link";
+import {
+  UserRound,
+  Ticket as TicketIcon,
+  BarChart3,
+  Plus,
+  Boxes,
+  Bot,
+  ClipboardList,
+  Archive,
+  ShieldCheck,
+  BookOpen,
+  LogOut,
+  type LucideIcon,
+} from "lucide-react";
 import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role, TicketStatus } from "@/generated/prisma/client";
 import TicketStatusBars from "./TicketStatusBars";
 import TrendSummaryButton from "./TrendSummaryButton";
 import FadeIn from "@/components/FadeIn";
+import GrainOverlay from "@/components/GrainOverlay";
 
 const ROLE_LABEL: Record<string, string> = {
   USER: "ผู้ใช้งานทั่วไป",
@@ -39,10 +54,31 @@ const STATUS_CHART_CONFIG: {
   },
 ];
 
+function ActionTile({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-start gap-2.5 rounded-2xl border border-gold/25 bg-card p-4 transition-colors duration-150 hover:border-gold/50 hover:bg-gold-wash/50"
+    >
+      <Icon className="h-5 w-5 text-gold" aria-hidden="true" />
+      <span className="text-sm font-medium text-foreground">{label}</span>
+    </Link>
+  );
+}
+
 export default async function DashboardPage() {
   const session = await auth();
   const user = session?.user;
   const isStaffOrAdmin = user?.role === Role.IT_STAFF || user?.role === Role.ADMIN;
+  const isAdmin = user?.role === Role.ADMIN;
 
   const grouped = user
     ? await prisma.ticket.groupBy({
@@ -62,112 +98,112 @@ export default async function DashboardPage() {
   const totalTickets = statusCounts.reduce((sum, c) => sum + c.count, 0);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
-      <FadeIn>
-        <h1 className="font-serif text-2xl font-semibold text-foreground">แดชบอร์ด</h1>
-        <p className="text-sm text-muted">IT Helpdesk & Asset Management</p>
-      </FadeIn>
+    <>
+      <GrainOverlay />
+      <main className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-12">
+        <FadeIn>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold-deep">
+            IT Helpdesk &amp; Asset Management
+          </p>
+          <h1 className="mt-1 text-balance font-serif text-4xl font-semibold tracking-tight text-foreground">
+            แดชบอร์ด
+          </h1>
+        </FadeIn>
 
-      <FadeIn delay={0.05} className="rounded-xl border border-gold/25 bg-card p-4 text-sm">
-        <p>
-          <span className="text-muted">ชื่อ: </span>
-          {user?.name}
-        </p>
-        <p>
-          <span className="text-muted">อีเมล: </span>
-          {user?.email}
-        </p>
-        <p>
-          <span className="text-muted">สิทธิ์: </span>
-          {user?.role ? ROLE_LABEL[user.role] : "-"}
-        </p>
-      </FadeIn>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-6">
+          <FadeIn
+            delay={0.05}
+            className="flex items-center gap-4 rounded-2xl border border-gold/25 bg-card p-6 shadow-[0_1px_2px_rgba(176,141,87,0.06),0_10px_28px_-14px_rgba(176,141,87,0.35)] sm:col-span-4"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold">
+              <UserRound className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-base font-semibold text-foreground">{user?.name}</p>
+              <p className="truncate text-sm text-muted">{user?.email}</p>
+              <span className="mt-1.5 inline-block rounded-full bg-gold-wash px-2.5 py-0.5 text-xs font-medium text-gold-deep">
+                {user?.role ? ROLE_LABEL[user.role] : "-"}
+              </span>
+            </div>
+          </FadeIn>
 
-      <FadeIn delay={0.1} className="rounded-xl border border-gold/25 bg-card p-4">
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-sm font-medium text-foreground">
-            {isStaffOrAdmin ? "สรุป Ticket ทั้งระบบ" : "สรุป Ticket ของฉัน"}
-          </h2>
-          <span className="whitespace-nowrap text-xs text-muted">
-            ทั้งหมด {totalTickets} รายการ
-          </span>
+          <FadeIn
+            delay={0.1}
+            className="flex flex-col justify-between gap-6 rounded-2xl bg-gold-deep p-6 text-white shadow-[0_12px_28px_-10px_rgba(124,98,57,0.55)] sm:col-span-2"
+          >
+            <TicketIcon className="h-6 w-6 text-white/80" aria-hidden="true" />
+            <div>
+              <p className="font-serif text-4xl font-semibold tabular-nums">{totalTickets}</p>
+              <p className="text-xs text-white/80">
+                {isStaffOrAdmin ? "Ticket ทั้งระบบ" : "Ticket ของฉัน"}
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn
+            delay={0.15}
+            className="rounded-2xl border border-gold/25 bg-card p-6 sm:col-span-6"
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-gold" aria-hidden="true" />
+              <h2 className="text-base font-semibold text-foreground">
+                {isStaffOrAdmin ? "สรุป Ticket ทั้งระบบ" : "สรุป Ticket ของฉัน"}
+              </h2>
+            </div>
+            <TicketStatusBars counts={statusCounts} />
+            {isStaffOrAdmin && <TrendSummaryButton />}
+          </FadeIn>
         </div>
-        <TicketStatusBars counts={statusCounts} />
-        {isStaffOrAdmin && <TrendSummaryButton />}
-      </FadeIn>
 
-      <FadeIn delay={0.15} className="flex flex-wrap gap-3">
-        <Link
-          href="/tickets"
-          className="rounded-full bg-gold px-4 py-2 text-sm font-medium text-white shadow-sm transition-[filter] duration-150 hover:brightness-110"
-        >
-          ตั๋วของฉัน
-        </Link>
-        <Link
-          href="/tickets/new"
-          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-        >
-          แจ้งปัญหาใหม่
-        </Link>
-        <Link
-          href="/assets"
-          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-        >
-          ยืม-คืนทรัพย์สิน
-        </Link>
-        <Link
-          href="/chatbot"
-          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-        >
-          ถาม-ตอบ IT (AI)
-        </Link>
-        {isStaffOrAdmin && (
-          <Link
-            href="/staff/tickets"
-            className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-          >
-            Ticket ทั้งหมด (Staff)
-          </Link>
-        )}
-        {user?.role === "ADMIN" && (
-          <>
+        <FadeIn delay={0.2}>
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted">
+            เมนูลัด
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <Link
-              href="/admin/assets"
-              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
+              href="/tickets/new"
+              className="col-span-2 flex items-center gap-3 rounded-2xl bg-gold-deep p-5 text-white shadow-[0_14px_34px_-12px_rgba(124,98,57,0.55)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.98]"
             >
-              จัดการทรัพย์สิน
+              <Plus className="h-6 w-6 shrink-0" aria-hidden="true" />
+              <div>
+                <p className="font-semibold">แจ้งปัญหาใหม่</p>
+                <p className="text-xs text-white/80">รายงานปัญหา IT ที่พบ</p>
+              </div>
             </Link>
-            <Link
-              href="/admin/users"
-              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-            >
-              จัดการสิทธิ์ผู้ใช้
-            </Link>
-            <Link
-              href="/admin/faq"
-              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
-            >
-              จัดการฐานความรู้ FAQ
-            </Link>
-          </>
-        )}
-      </FadeIn>
 
-      <FadeIn delay={0.2}>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button
-            type="submit"
-            className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
+            <ActionTile href="/tickets" icon={TicketIcon} label="ตั๋วของฉัน" />
+            <ActionTile href="/assets" icon={Boxes} label="ยืม-คืนทรัพย์สิน" />
+            <ActionTile href="/chatbot" icon={Bot} label="ถาม-ตอบ IT (AI)" />
+            {isStaffOrAdmin && (
+              <ActionTile href="/staff/tickets" icon={ClipboardList} label="Ticket ทั้งหมด" />
+            )}
+            {isAdmin && (
+              <>
+                <ActionTile href="/admin/assets" icon={Archive} label="จัดการทรัพย์สิน" />
+                <ActionTile href="/admin/users" icon={ShieldCheck} label="จัดการสิทธิ์ผู้ใช้" />
+                <ActionTile href="/admin/faq" icon={BookOpen} label="จัดการฐานความรู้ FAQ" />
+              </>
+            )}
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.25}>
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/login" });
+            }}
           >
-            ออกจากระบบ
-          </button>
-        </form>
-      </FadeIn>
-    </main>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors duration-150 hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              ออกจากระบบ
+            </button>
+          </form>
+        </FadeIn>
+      </main>
+    </>
   );
 }

@@ -10,6 +10,10 @@
   --gold: #b08d57;
   --gold-light: #d8c39c;
   --gold-wash: #f3e9d6;
+  /* Same hue as --gold, darkened for WCAG AA text/fill contrast (>=4.5:1
+     on both --background and white text) — --gold itself is ~2.9:1 on
+     light backgrounds and only safe for large decorative use. */
+  --gold-deep: #7c6239;
 }
 
 @theme inline {
@@ -20,6 +24,7 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-wash: var(--gold-wash);
+  --color-gold-deep: var(--gold-deep);
   --font-serif: var(--font-noto-serif-thai);
   --font-sans: var(--font-noto-sans-thai);
 }
