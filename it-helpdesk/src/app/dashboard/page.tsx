@@ -3,6 +3,7 @@ import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role, TicketStatus } from "@/generated/prisma/client";
 import TicketStatusBars from "./TicketStatusBars";
+import TrendSummaryButton from "./TrendSummaryButton";
 
 const ROLE_LABEL: Record<string, string> = {
   USER: "ผู้ใช้งานทั่วไป",
@@ -91,6 +92,7 @@ export default async function DashboardPage() {
           </span>
         </div>
         <TicketStatusBars counts={statusCounts} />
+        {isStaffOrAdmin && <TrendSummaryButton />}
       </div>
 
       <div className="flex flex-wrap gap-3">
