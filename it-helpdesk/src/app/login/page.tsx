@@ -1,11 +1,17 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import gsap from "gsap";
+import { SplitText } from "gsap/SplitText";
 import { login } from "@/app/actions/auth";
 import Hero3D from "@/components/Hero3D";
 import TiltCard from "@/components/TiltCard";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(SplitText);
+}
 
 function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
@@ -53,22 +59,64 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const orbWrapperRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    let split: SplitText | null = null;
+
+    const ctx = gsap.context(() => {
+      split = titleRef.current
+        ? new SplitText(titleRef.current, { type: "chars" })
+        : null;
+
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(orbWrapperRef.current, { opacity: 0, scale: 0.7, duration: 0.8 })
+        .from(
+          split?.chars ?? [],
+          { opacity: 0, y: 20, stagger: 0.03, duration: 0.5 },
+          "-=0.5"
+        )
+        .from(".reveal-item", { opacity: 0, y: 16, stagger: 0.12, duration: 0.5 }, "-=0.3");
+    }, rootRef);
+
+    return () => {
+      ctx.revert();
+      split?.revert();
+    };
+  }, []);
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4">
+    <main
+      ref={rootRef}
+      className="mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4"
+    >
       <TiltCard className="flex w-full flex-col gap-6 rounded-2xl border border-gold/25 bg-card px-8 py-10 shadow-[0_25px_70px_-20px_rgba(176,141,87,0.35)]">
         <div className="flex flex-col items-center gap-3 text-center">
-          <Hero3D className="h-16 w-16" />
+          <div ref={orbWrapperRef}>
+            <Hero3D className="h-16 w-16" />
+          </div>
           <div>
-            <h1 className="font-serif text-2xl font-semibold text-foreground">เข้าสู่ระบบ</h1>
-            <p className="text-sm text-muted">IT Helpdesk & Asset Management</p>
+            <h1 ref={titleRef} className="font-serif text-2xl font-semibold text-foreground">
+              เข้าสู่ระบบ
+            </h1>
+            <p className="reveal-item text-sm text-muted">IT Helpdesk & Asset Management</p>
           </div>
         </div>
 
-        <Suspense fallback={null}>
-          <LoginForm />
-        </Suspense>
+        <div className="reveal-item">
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
+        </div>
 
-        <p className="text-center text-sm text-muted">
+        <p className="reveal-item text-center text-sm text-muted">
           ยังไม่มีบัญชี?{" "}
           <Link href="/register" className="text-gold underline">
             สมัครสมาชิก
