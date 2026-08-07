@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Luxury/Premium palette — ivory + champagne gold. Fixed brand look,
+     deliberately not swapped by prefers-color-scheme. */
+  --background: #faf6ed;
+  --foreground: #2a2420;
+  --muted: #8b7f6e;
+  --card: #fffefb;
+  --gold: #b08d57;
+  --gold-light: #d8c39c;
+  --gold-wash: #f3e9d6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-wash: var(--gold-wash);
+  --font-serif: var(--font-noto-serif-thai);
+  --font-sans: var(--font-noto-sans-thai);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
