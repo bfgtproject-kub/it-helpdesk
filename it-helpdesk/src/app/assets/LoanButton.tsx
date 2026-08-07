@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PackageCheck, Undo2 } from "lucide-react";
 import { borrowAsset, returnAsset, type LoanFormState } from "@/app/actions/loans";
 
 export function BorrowButton({ assetId }: { assetId: string }) {
@@ -11,12 +12,13 @@ export function BorrowButton({ assetId }: { assetId: string }) {
   );
 
   return (
-    <form action={formAction} className="flex flex-col items-end gap-1">
+    <form action={formAction} className="flex shrink-0 flex-col items-end gap-1">
       <button
         type="submit"
         disabled={pending}
-        className="whitespace-nowrap rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-gold-deep px-3 py-1.5 text-sm font-medium text-white transition-[filter] duration-150 hover:brightness-110 disabled:opacity-50"
       >
+        <PackageCheck className="h-4 w-4" aria-hidden="true" />
         {pending ? "กำลังยืม..." : "ยืม"}
       </button>
       {state?.error && <span className="text-xs text-red-600">{state.error}</span>}
@@ -32,12 +34,13 @@ export function ReturnButton({ loanId }: { loanId: string }) {
   );
 
   return (
-    <form action={formAction} className="flex flex-col items-end gap-1">
+    <form action={formAction} className="flex shrink-0 flex-col items-end gap-1">
       <button
         type="submit"
         disabled={pending}
-        className="whitespace-nowrap rounded-md border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700"
+        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gold/40 px-3 py-1.5 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash disabled:opacity-50"
       >
+        <Undo2 className="h-4 w-4" aria-hidden="true" />
         {pending ? "กำลังคืน..." : "คืน"}
       </button>
       {state?.error && <span className="text-xs text-red-600">{state.error}</span>}

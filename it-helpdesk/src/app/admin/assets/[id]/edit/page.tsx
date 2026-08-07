@@ -1,9 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import QRCode from "qrcode";
+import { QrCode, Download } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
+import FadeIn from "@/components/FadeIn";
 import AssetEditForm from "../../AssetEditForm";
 
 export default async function EditAssetPage(
@@ -28,42 +30,53 @@ export default async function EditAssetPage(
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4 py-12">
-      <div>
-        <Link href="/admin/assets" className="text-sm text-zinc-500 underline">
+      <FadeIn>
+        <Link href="/admin/assets" className="text-sm text-muted underline">
           &larr; ทรัพย์สินทั้งหมด
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold">{asset.name}</h1>
-        <p className="text-sm text-zinc-500">รหัสครุภัณฑ์: {asset.assetTag}</p>
-      </div>
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-foreground">{asset.name}</h1>
+        <p className="text-sm text-muted">รหัสครุภัณฑ์: {asset.assetTag}</p>
+      </FadeIn>
 
-      <div className="flex flex-col items-center gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+      <FadeIn
+        delay={0.05}
+        className="flex flex-col items-center gap-3 rounded-2xl border border-gold/25 bg-card p-5"
+      >
+        <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.15em] text-gold-deep">
+          <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+          QR Code
+        </div>
         {/* eslint-disable-next-line @next/next/no-img-element -- data: URI, next/image can't optimize it anyway */}
         <img
           src={qrDataUrl}
           alt={`QR code สำหรับรหัสครุภัณฑ์ ${asset.assetTag}`}
           width={200}
           height={200}
+          className="rounded-lg border border-gold/20"
         />
-        <p className="text-xs text-zinc-500">
+        <p className="text-center text-xs text-muted">
           สแกนเพื่อดึงรหัสครุภัณฑ์ {asset.assetTag} — ใช้ติดฉลากทรัพย์สินได้เลย
         </p>
         <a
           href={qrDataUrl}
           download={`qr-${asset.assetTag}.png`}
-          className="text-xs text-zinc-500 underline"
+          className="inline-flex items-center gap-1 text-xs text-gold-deep underline"
         >
+          <Download className="h-3.5 w-3.5" aria-hidden="true" />
           ดาวน์โหลด QR
         </a>
-      </div>
+      </FadeIn>
 
-      <AssetEditForm
-        assetId={asset.id}
-        currentName={asset.name}
-        currentStatus={asset.status}
-        currentPurchaseDate={
-          asset.purchaseDate ? asset.purchaseDate.toISOString().slice(0, 10) : ""
-        }
-      />
+      <FadeIn delay={0.1}>
+        <AssetEditForm
+          assetId={asset.id}
+          currentName={asset.name}
+          currentStatus={asset.status}
+          currentPurchaseDate={
+            asset.purchaseDate ? asset.purchaseDate.toISOString().slice(0, 10) : ""
+          }
+        />
+      </FadeIn>
     </main>
   );
 }

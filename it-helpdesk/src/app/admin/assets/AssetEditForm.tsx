@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Save, Trash2 } from "lucide-react";
 import { updateAsset, deleteAsset, type AssetFormState } from "@/app/actions/admin-assets";
 
 const STATUS_OPTIONS = [
@@ -35,15 +36,15 @@ export default function AssetEditForm({
           name="name"
           defaultValue={currentName}
           required
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
         />
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-500">สถานะ</span>
+          <span className="text-muted">สถานะ</span>
           <select
             name="status"
             defaultValue={currentStatus}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -54,12 +55,12 @@ export default function AssetEditForm({
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-500">วันที่จัดซื้อ</span>
+          <span className="text-muted">วันที่จัดซื้อ</span>
           <input
             name="purchaseDate"
             type="date"
             defaultValue={currentPurchaseDate}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
           />
         </label>
 
@@ -68,8 +69,9 @@ export default function AssetEditForm({
         <button
           type="submit"
           disabled={pending}
-          className="mt-2 w-fit rounded-md bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+          className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-gold-deep px-3 py-2 text-sm font-medium text-white transition-[filter] duration-150 hover:brightness-110 disabled:opacity-50"
         >
+          <Save className="h-4 w-4" aria-hidden="true" />
           {pending ? "กำลังบันทึก..." : "บันทึก"}
         </button>
       </form>
@@ -84,8 +86,9 @@ export default function AssetEditForm({
       >
         <button
           type="submit"
-          className="rounded-md border border-red-300 px-3 py-2 text-sm text-red-600 dark:border-red-900"
+          className="inline-flex items-center gap-1.5 rounded-full border border-red-300 px-3 py-2 text-sm text-red-600 transition-colors duration-150 hover:bg-red-50"
         >
+          <Trash2 className="h-4 w-4" aria-hidden="true" />
           ลบทรัพย์สิน
         </button>
       </form>
