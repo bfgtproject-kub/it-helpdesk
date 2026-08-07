@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Role, TicketStatus } from "@/generated/prisma/client";
 import TicketStatusBars from "./TicketStatusBars";
 import TrendSummaryButton from "./TrendSummaryButton";
+import FadeIn from "@/components/FadeIn";
 
 const ROLE_LABEL: Record<string, string> = {
   USER: "ผู้ใช้งานทั่วไป",
@@ -62,68 +63,68 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
-      <div>
-        <h1 className="text-2xl font-semibold">แดชบอร์ด</h1>
-        <p className="text-sm text-zinc-500">IT Helpdesk & Asset Management</p>
-      </div>
+      <FadeIn>
+        <h1 className="font-serif text-2xl font-semibold text-foreground">แดชบอร์ด</h1>
+        <p className="text-sm text-muted">IT Helpdesk & Asset Management</p>
+      </FadeIn>
 
-      <div className="rounded-md border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+      <FadeIn delay={0.05} className="rounded-xl border border-gold/25 bg-card p-4 text-sm">
         <p>
-          <span className="text-zinc-500">ชื่อ: </span>
+          <span className="text-muted">ชื่อ: </span>
           {user?.name}
         </p>
         <p>
-          <span className="text-zinc-500">อีเมล: </span>
+          <span className="text-muted">อีเมล: </span>
           {user?.email}
         </p>
         <p>
-          <span className="text-zinc-500">สิทธิ์: </span>
+          <span className="text-muted">สิทธิ์: </span>
           {user?.role ? ROLE_LABEL[user.role] : "-"}
         </p>
-      </div>
+      </FadeIn>
 
-      <div className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+      <FadeIn delay={0.1} className="rounded-xl border border-gold/25 bg-card p-4">
         <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-sm font-medium">
+          <h2 className="text-sm font-medium text-foreground">
             {isStaffOrAdmin ? "สรุป Ticket ทั้งระบบ" : "สรุป Ticket ของฉัน"}
           </h2>
-          <span className="whitespace-nowrap text-xs text-zinc-500">
+          <span className="whitespace-nowrap text-xs text-muted">
             ทั้งหมด {totalTickets} รายการ
           </span>
         </div>
         <TicketStatusBars counts={statusCounts} />
         {isStaffOrAdmin && <TrendSummaryButton />}
-      </div>
+      </FadeIn>
 
-      <div className="flex flex-wrap gap-3">
+      <FadeIn delay={0.15} className="flex flex-wrap gap-3">
         <Link
           href="/tickets"
-          className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+          className="rounded-full bg-gold px-4 py-2 text-sm font-medium text-white shadow-sm transition-[filter] duration-150 hover:brightness-110"
         >
           ตั๋วของฉัน
         </Link>
         <Link
           href="/tickets/new"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
         >
           แจ้งปัญหาใหม่
         </Link>
         <Link
           href="/assets"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
         >
           ยืม-คืนทรัพย์สิน
         </Link>
         <Link
           href="/chatbot"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+          className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
         >
           ถาม-ตอบ IT (AI)
         </Link>
         {isStaffOrAdmin && (
           <Link
             href="/staff/tickets"
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+            className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
           >
             Ticket ทั้งหมด (Staff)
           </Link>
@@ -132,39 +133,41 @@ export default async function DashboardPage() {
           <>
             <Link
               href="/admin/assets"
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
             >
               จัดการทรัพย์สิน
             </Link>
             <Link
               href="/admin/users"
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
             >
               จัดการสิทธิ์ผู้ใช้
             </Link>
             <Link
               href="/admin/faq"
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+              className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
             >
               จัดการฐานความรู้ FAQ
             </Link>
           </>
         )}
-      </div>
+      </FadeIn>
 
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/login" });
-        }}
-      >
-        <button
-          type="submit"
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+      <FadeIn delay={0.2}>
+        <form
+          action={async () => {
+            "use server";
+            await signOut({ redirectTo: "/login" });
+          }}
         >
-          ออกจากระบบ
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="rounded-full border border-gold/40 px-4 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-gold-wash"
+          >
+            ออกจากระบบ
+          </button>
+        </form>
+      </FadeIn>
     </main>
   );
 }
