@@ -26,12 +26,20 @@ export default async function AdminAssetsPage() {
           <h1 className="text-2xl font-semibold">จัดการทรัพย์สิน</h1>
           <p className="text-sm text-zinc-500">ทั้งหมด {assets.length} รายการ</p>
         </div>
-        <Link
-          href="/admin/assets/new"
-          className="whitespace-nowrap rounded-md bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
-        >
-          เพิ่มทรัพย์สิน
-        </Link>
+        <div className="flex flex-shrink-0 gap-2">
+          <Link
+            href="/admin/assets/ocr"
+            className="whitespace-nowrap rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+          >
+            สแกนป้ายเก่า (AI)
+          </Link>
+          <Link
+            href="/admin/assets/new"
+            className="whitespace-nowrap rounded-md bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+          >
+            เพิ่มทรัพย์สิน
+          </Link>
+        </div>
       </div>
 
       {assets.length === 0 ? (
