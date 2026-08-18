@@ -5,14 +5,23 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { User, Lock, LogIn } from "lucide-react";
 import { login } from "@/app/actions/auth";
 import Hero3D from "@/components/Hero3D";
 import TiltCard from "@/components/TiltCard";
 import Mascot from "@/components/Mascot";
+import MagneticButton from "@/components/MagneticButton";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(SplitText);
 }
+
+// Recessed field: the inset shadow does the soft-UI work, and the hairline
+// border carries the WCAG 1.4.11 boundary contrast that a shadow alone
+// cannot (see --line in globals.css). Focus is handled by the global
+// :focus-visible ring, so no outline-none here.
+const FIELD_CLASS =
+  "w-full rounded-xl border border-line/40 bg-background py-2.5 pl-10 pr-3 text-sm text-foreground shadow-neu-inset placeholder:text-muted";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -44,42 +53,60 @@ function LoginForm() {
   return (
     <>
       {justRegistered && (
-        <p className="rounded-md border border-gold/30 bg-gold-wash px-3 py-2 text-sm font-medium text-foreground">
+        <p className="rounded-xl bg-accent-soft px-3 py-2 text-sm font-medium text-accent shadow-neu-inset">
           สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          name="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="อีเมล"
-          autoComplete="email"
-          required
-          className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
-        />
-        <input
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="รหัสผ่าน"
-          autoComplete="current-password"
-          required
-          className="rounded-lg border border-gold/25 bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gold"
-        />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="relative">
+          <User
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            aria-hidden="true"
+          />
+          <input
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="อีเมล"
+            autoComplete="email"
+            required
+            className={FIELD_CLASS}
+          />
+        </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="relative">
+          <Lock
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            aria-hidden="true"
+          />
+          <input
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="รหัสผ่าน"
+            autoComplete="current-password"
+            required
+            className={FIELD_CLASS}
+          />
+        </div>
 
-        <button
+        {error && (
+          <p role="alert" className="text-sm font-medium text-red-700">
+            {error}
+          </p>
+        )}
+
+        <MagneticButton
           type="submit"
           disabled={pending}
-          className="mt-2 rounded-full bg-gold-deep px-3 py-2.5 text-sm font-medium text-white transition-[filter] duration-150 hover:brightness-110 disabled:opacity-50"
+          className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold tracking-wide text-white disabled:opacity-60"
         >
+          <LogIn className="h-4 w-4" aria-hidden="true" />
           {pending ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
-        </button>
+        </MagneticButton>
       </form>
     </>
   );
@@ -104,7 +131,8 @@ export default function LoginPage() {
         : null;
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.from(orbWrapperRef.current, { opacity: 0, scale: 0.7, duration: 0.8 })
+      tl.from(".neu-plate", { opacity: 0, scale: 0.92, duration: 0.7 })
+        .from(orbWrapperRef.current, { opacity: 0, scale: 0.7, duration: 0.8 }, "-=0.4")
         .from(
           split?.chars ?? [],
           { opacity: 0, y: 20, stagger: 0.03, duration: 0.5 },
@@ -124,20 +152,32 @@ export default function LoginPage() {
       ref={rootRef}
       id="main-content"
       tabIndex={-1}
-      className="relative mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4"
+      className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-4"
     >
-      <Mascot variant="ai" className="pointer-events-none absolute right-2 bottom-[12%] h-16 w-16 sm:right-4" />
+      {/* Wide, very soft disc behind the card — the concentric "pressed into
+          a sheet" look the reference mockups get from a big blurred plate. */}
+      <div
+        aria-hidden="true"
+        className="neu-plate pointer-events-none absolute h-[21rem] w-[21rem] rounded-full bg-background shadow-neu-lg sm:h-[30rem] sm:w-[30rem]"
+      />
 
-      <TiltCard className="flex w-full flex-col gap-6 rounded-2xl border border-gold/25 bg-card px-8 py-10 shadow-[0_25px_70px_-20px_rgba(176,141,87,0.35)]">
-        <div className="flex flex-col items-center gap-3 text-center">
+      <Mascot
+        variant="ai"
+        className="pointer-events-none absolute bottom-[6%] right-2 h-14 w-14 sm:right-4 sm:h-16 sm:w-16"
+      />
+
+      <TiltCard className="relative flex w-full flex-col gap-7 rounded-[2rem] bg-card px-8 py-10 shadow-neu-lg">
+        <div className="flex flex-col items-center gap-4 text-center">
           <div ref={orbWrapperRef}>
-            <Hero3D className="h-16 w-16" />
+            <Hero3D className="h-20 w-20" />
           </div>
           <div>
-            <h1 ref={titleRef} className="font-serif text-2xl font-semibold text-foreground">
+            <h1 ref={titleRef} className="text-3xl font-bold tracking-tight text-foreground">
               เข้าสู่ระบบ
             </h1>
-            <p className="reveal-item text-sm text-muted">IT Helpdesk & Asset Management</p>
+            <p className="reveal-item mt-1 text-sm text-muted">
+              IT Helpdesk &amp; Asset Management
+            </p>
           </div>
         </div>
 
@@ -149,7 +189,7 @@ export default function LoginPage() {
 
         <p className="reveal-item text-center text-sm text-muted">
           ยังไม่มีบัญชี?{" "}
-          <Link href="/register" className="text-gold underline">
+          <Link href="/register" className="font-medium text-accent underline">
             สมัครสมาชิก
           </Link>
         </p>

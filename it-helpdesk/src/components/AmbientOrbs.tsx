@@ -85,37 +85,42 @@ export default function AmbientOrbs() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
+      {/* Soft UI wants a surface that reads as one continuous sheet, so these
+          are tinted neutral and kept very faint — just enough drift to stop
+          the flat gray feeling dead, never enough to compete with the
+          raised/inset shadows that carry the actual hierarchy. */}
       <div ref={wrap1} className="absolute -left-10 -top-8 h-56 w-56 sm:-left-16 sm:-top-10 sm:h-[30rem] sm:w-[30rem]">
         <div
           ref={blob1}
-          className="h-full w-full rounded-full opacity-80 blur-2xl"
+          className="h-full w-full rounded-full opacity-30 blur-3xl"
           style={{
             background:
-              "radial-gradient(circle, var(--gold-light) 0%, var(--gold-light) 35%, transparent 72%)",
+              "radial-gradient(circle, var(--neu-light) 0%, var(--neu-light) 35%, transparent 72%)",
           }}
         />
       </div>
       <div ref={wrap2} className="absolute -right-16 top-[6%] h-64 w-64 sm:-right-32 sm:top-[8%] sm:h-[36rem] sm:w-[36rem]">
         <div
           ref={blob2}
-          className="h-full w-full rounded-full opacity-70 blur-2xl"
+          className="h-full w-full rounded-full opacity-25 blur-3xl"
           style={{
-            background: "radial-gradient(circle, var(--gold) 0%, var(--gold) 30%, transparent 72%)",
+            background:
+              "radial-gradient(circle, var(--neu-tint) 0%, var(--neu-tint) 30%, transparent 72%)",
           }}
         />
       </div>
       <div ref={wrap3} className="absolute -bottom-16 left-[10%] h-52 w-52 sm:-bottom-24 sm:left-[18%] sm:h-[28rem] sm:w-[28rem]">
         <div
           ref={blob3}
-          className="h-full w-full rounded-full opacity-65 blur-2xl"
+          className="h-full w-full rounded-full opacity-20 blur-3xl"
           style={{
             background:
-              "radial-gradient(circle, var(--gold-deep) 0%, var(--gold-deep) 25%, transparent 72%)",
+              "radial-gradient(circle, var(--neu-dark) 0%, var(--neu-dark) 25%, transparent 72%)",
           }}
         />
       </div>
       <div
-        className="absolute inset-0 opacity-[0.08] mix-blend-multiply"
+        className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
         style={{ backgroundImage: `url("${NOISE_SVG}")` }}
       />
     </div>

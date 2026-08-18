@@ -1,23 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  /* Luxury/Premium palette — ivory + champagne gold. Fixed brand look,
-     deliberately not swapped by prefers-color-scheme. */
-  --background: #faf6ed;
-  --foreground: #2a2420;
-  /* Darkened from the original #8b7f6e (~3.6:1 on --background, fails WCAG
-     AA's 4.5:1 text minimum) to the same hue at ~5.3:1 on --background,
-     ~5.7:1 on --card, ~4.7:1 on --gold-wash — clears AA against every
-     surface --muted text actually sits on in this app. */
-  --muted: #6f6557;
-  --card: #fffefb;
-  --gold: #b08d57;
-  --gold-light: #d8c39c;
-  --gold-wash: #f3e9d6;
-  /* Same hue as --gold, darkened for WCAG AA text/fill contrast (>=4.5:1
-     on both --background and white text) — --gold itself is ~2.9:1 on
-     light backgrounds and only safe for large decorative use. */
-  --gold-deep: #7c6239;
+  /* ------------------------------------------------------------------
+     Neumorphism / Soft UI — monochrome gray with a single blue accent.
+     Fixed brand look, deliberately not swapped by prefers-color-scheme.
+
+     Every value below was picked by measuring WCAG contrast, not by eye
+     (ratios in comments are vs --background / vs --card).
+     ------------------------------------------------------------------ */
+  --background: #e0e0e0;
+  --card: #e6e6e6;
+  --foreground: #2f3437; /* 9.54:1 / 10.09:1 — AA+ body text */
+  --muted: #5a6265; /* 4.72:1 / 4.99:1 — clears AA 4.5:1 for secondary text */
+
+  /* The two light sources every soft-UI shadow is built from. These are
+     decorative only: #bebebe on #e0e0e0 is 1.41:1, which is exactly why
+     neumorphism fails WCAG 1.4.11 if shadows are the ONLY thing marking
+     an interactive control — see --line below. */
+  --neu-dark: #bebebe;
+  --neu-light: #ffffff;
+
+  /* Single accent. Blue, not red — red is already the "urgent" ticket
+     severity in this app and reusing it for UI chrome would be confusing. */
+  --accent: #2f4fd8; /* white-on-accent 6.50:1, accent-as-text 4.92:1 — both AA */
+  --accent-soft: #dbe2fb; /* accent text on this wash = 5.04:1 */
+
+  /* Hairline for input/control boundaries. 3.25:1 / 3.44:1 clears the
+     WCAG 1.4.11 non-text-contrast minimum of 3:1 that a pure neumorphic
+     shadow edge cannot reach. */
+  --line: #7a7a7a;
+
+  /* Decorative tint for the ambient background orbs + mascot fills. */
+  --neu-tint: #c3ccdb;
+
+  /* Legacy raw variables from the previous gold theme. The @theme aliases
+     below only cover Tailwind *class* names; SVG presentation attributes
+     and inline styles reference these directly (Mascot.tsx does), and an
+     unresolved var() in a `fill`/`stroke` attribute silently falls back to
+     black rather than being ignored. Keep these until those call sites are
+     migrated to the accent/neu names. */
+  --gold: var(--accent);
+  --gold-deep: var(--accent);
+  --gold-wash: var(--accent-soft);
+  --gold-light: var(--neu-tint);
 }
 
 @theme inline {
@@ -25,11 +50,31 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-card: var(--card);
-  --color-gold: var(--gold);
-  --color-gold-light: var(--gold-light);
-  --color-gold-wash: var(--gold-wash);
-  --color-gold-deep: var(--gold-deep);
-  --font-serif: var(--font-noto-serif-thai);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-line: var(--line);
+  --color-neu-dark: var(--neu-dark);
+  --color-neu-light: var(--neu-light);
+
+  /* Legacy aliases. ~40 files still carry the previous theme's `gold-*`
+     class names; pointing them at the new palette re-skins the whole app
+     without touching those files. New code should use accent/accent-soft.
+     These are NOT gold anymore — the name is kept only for compatibility. */
+  --color-gold: var(--accent);
+  --color-gold-deep: var(--accent);
+  --color-gold-wash: var(--accent-soft);
+  --color-gold-light: var(--neu-tint);
+
+  /* Soft-UI elevation. Raised = light from top-left, shadow to bottom-right;
+     inset flips both to read as pressed/recessed. */
+  --shadow-neu-sm: 3px 3px 6px var(--neu-dark), -3px -3px 6px var(--neu-light);
+  --shadow-neu: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
+  --shadow-neu-lg: 12px 12px 24px var(--neu-dark), -12px -12px 24px var(--neu-light);
+  --shadow-neu-inset: inset 4px 4px 8px var(--neu-dark), inset -4px -4px 8px var(--neu-light);
+  --shadow-neu-pressed: inset 6px 6px 12px var(--neu-dark), inset -6px -6px 12px var(--neu-light);
+
+  --font-serif: var(--font-noto-sans-thai);
   --font-sans: var(--font-noto-sans-thai);
 }
 
@@ -37,4 +82,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Soft UI removes the borders that normally show keyboard focus, so an
+   explicit focus ring is required rather than optional. Scoped to
+   :focus-visible so it appears for keyboard users without ringing on
+   every mouse click. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

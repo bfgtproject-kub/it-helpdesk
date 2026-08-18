@@ -19,9 +19,10 @@ export default function TicketStatusBars({ counts }: { counts: StatusCount[] }) 
         return (
           <div key={c.status} className="flex items-center gap-3">
             <span className="w-28 shrink-0 text-xs text-muted">{c.label}</span>
-            <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-gold-wash">
+            {/* Recessed track so the bars read as sitting inside the surface. */}
+            <div className="relative h-5 flex-1 overflow-hidden rounded-full bg-background shadow-neu-inset">
               <div
-                className={`h-5 rounded-r-[4px] ${c.barClass}`}
+                className={`h-5 rounded-full ${c.barClass}`}
                 style={{ width: `${widthPct}%` }}
               />
             </div>

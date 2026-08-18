@@ -67,9 +67,9 @@ function ActionTile({
   return (
     <Link
       href={href}
-      className="flex flex-col items-start gap-2.5 rounded-2xl border border-gold/25 bg-card p-4 transition-colors duration-150 hover:border-gold/50 hover:bg-gold-wash/50"
+      className="flex flex-col items-start gap-2.5 rounded-2xl bg-card p-4 shadow-neu transition-shadow duration-200 hover:shadow-neu-lg"
     >
-      <Icon className="h-5 w-5 text-gold" aria-hidden="true" />
+      <Icon className="h-5 w-5 text-accent" aria-hidden="true" />
       <span className="text-sm font-medium text-foreground">{label}</span>
     </Link>
   );
@@ -103,10 +103,10 @@ export default async function DashboardPage() {
       <Mascot variant="ai" className="pointer-events-none fixed bottom-4 right-4 z-0 hidden h-16 w-16 sm:block" />
       <main id="main-content" tabIndex={-1} className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-12">
         <FadeIn>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold-deep">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
             IT Helpdesk &amp; Asset Management
           </p>
-          <h1 className="mt-1 text-balance font-serif text-4xl font-semibold tracking-tight text-foreground">
+          <h1 className="mt-1 text-balance text-4xl font-bold tracking-tight text-foreground">
             แดชบอร์ด
           </h1>
         </FadeIn>
@@ -114,20 +114,20 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-6">
           <FadeIn
             delay={0.05}
-            className="flex items-center gap-4 rounded-2xl border border-gold/25 bg-card p-6 shadow-[0_1px_2px_rgba(176,141,87,0.06),0_10px_28px_-14px_rgba(176,141,87,0.35)] sm:col-span-4"
+            className="flex items-center gap-4 rounded-2xl bg-card p-6 shadow-neu sm:col-span-4"
           >
             <UserAvatar name={user?.name ?? "?"} image={user?.image} size="md" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-base font-semibold text-foreground">{user?.name}</p>
               <p className="truncate text-sm text-muted">{user?.email}</p>
-              <span className="mt-1.5 inline-block rounded-full bg-gold-wash px-2.5 py-0.5 text-xs font-medium text-gold-deep">
+              <span className="mt-1.5 inline-block rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent shadow-neu-inset">
                 {user?.role ? ROLE_LABEL[user.role] : "-"}
               </span>
             </div>
             <Link
               href="/settings"
               aria-label="ตั้งค่าบัญชี"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors duration-150 hover:bg-gold-wash hover:text-gold-deep"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted shadow-neu-sm transition-shadow duration-150 hover:shadow-neu-pressed"
             >
               <Settings className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -135,11 +135,11 @@ export default async function DashboardPage() {
 
           <FadeIn
             delay={0.1}
-            className="flex flex-col justify-between gap-6 rounded-2xl bg-gold-deep p-6 text-white shadow-[0_12px_28px_-10px_rgba(124,98,57,0.55)] sm:col-span-2"
+            className="flex flex-col justify-between gap-6 rounded-2xl bg-accent p-6 text-white shadow-neu sm:col-span-2"
           >
             <TicketIcon className="h-6 w-6 text-white/80" aria-hidden="true" />
             <div>
-              <p className="font-serif text-4xl font-semibold tabular-nums">{totalTickets}</p>
+              <p className="text-4xl font-bold tabular-nums">{totalTickets}</p>
               <p className="text-xs text-white/80">
                 {isStaffOrAdmin ? "Ticket ทั้งระบบ" : "Ticket ของฉัน"}
               </p>
@@ -148,10 +148,10 @@ export default async function DashboardPage() {
 
           <FadeIn
             delay={0.15}
-            className="rounded-2xl border border-gold/25 bg-card p-6 sm:col-span-6"
+            className="rounded-2xl bg-card p-6 shadow-neu sm:col-span-6"
           >
             <div className="mb-4 flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-gold" aria-hidden="true" />
+              <BarChart3 className="h-5 w-5 text-accent" aria-hidden="true" />
               <h2 className="text-base font-semibold text-foreground">
                 {isStaffOrAdmin ? "สรุป Ticket ทั้งระบบ" : "สรุป Ticket ของฉัน"}
               </h2>
@@ -168,7 +168,7 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <Link
               href="/tickets/new"
-              className="col-span-2 flex items-center gap-3 rounded-2xl bg-gold-deep p-5 text-white shadow-[0_14px_34px_-12px_rgba(124,98,57,0.55)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.98]"
+              className="col-span-2 flex items-center gap-3 rounded-2xl bg-accent p-5 text-white shadow-neu transition-shadow duration-200 hover:shadow-neu-lg active:shadow-neu-pressed"
             >
               <Plus className="h-6 w-6 shrink-0" aria-hidden="true" />
               <div>
