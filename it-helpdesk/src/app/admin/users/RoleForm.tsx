@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type ChangeEvent } from "react";
 import { updateUserRole } from "@/app/actions/admin-users";
+import { useToast } from "@/components/ToastProvider";
 
 const ROLE_OPTIONS = [
   { value: "USER", label: "ผู้ใช้งานทั่วไป" },
@@ -20,8 +21,8 @@ export default function RoleForm({
 }) {
   const [role, setRole] = useState(currentRole);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
+  const { showToast } = useToast();
 
   // Deliberately not a <form action={...}> — React 19 resets uncontrolled
   // (and even controlled, since the reset happens outside React's own
@@ -33,7 +34,6 @@ export default function RoleForm({
     const newRole = e.target.value;
     setRole(newRole);
     setError(null);
-    setSuccess(false);
 
     startTransition(async () => {
       const formData = new FormData();
@@ -44,7 +44,7 @@ export default function RoleForm({
         setRole(currentRole);
         return;
       }
-      setSuccess(true);
+      showToast("บันทึกสิทธิ์ผู้ใช้เรียบร้อย");
     });
   }
 
@@ -65,7 +65,6 @@ export default function RoleForm({
       </select>
       {disabled && <span className="text-xs text-muted">บัญชีของคุณเอง</span>}
       {pending && <span className="text-xs text-muted">กำลังบันทึก...</span>}
-      {success && <span className="text-xs text-green-600">บันทึกแล้ว</span>}
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>
   );

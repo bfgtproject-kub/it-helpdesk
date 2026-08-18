@@ -1,21 +1,56 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, Plus, MessageCircleQuestion } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { Prisma, Role } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
+import ToastOnParam from "@/components/ToastOnParam";
+import SearchFilterBar from "@/components/SearchFilterBar";
+import Pagination from "@/components/Pagination";
 
-export default async function AdminFaqPage() {
+const PAGE_SIZE = 10;
+
+export default async function AdminFaqPage(props: PageProps<"/admin/faq">) {
   const session = await auth();
   if (!session?.user || session.user.role !== Role.ADMIN) {
     redirect("/dashboard");
   }
 
-  const faqs = await prisma.faqEntry.findMany({ orderBy: { createdAt: "desc" } });
+  const sp = await props.searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const page = Math.max(1, Number(sp.page) || 1);
+
+  const where: Prisma.FaqEntryWhereInput = q
+    ? {
+        OR: [
+          { question: { contains: q, mode: "insensitive" } },
+          { answer: { contains: q, mode: "insensitive" } },
+        ],
+      }
+    : {};
+
+  const [faqs, total] = await Promise.all([
+    prisma.faqEntry.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.faqEntry.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+      <Suspense fallback={null}>
+        <ToastOnParam param="created" message="เพิ่มคำถามสำเร็จ" />
+        <ToastOnParam param="updated" message="บันทึกคำถามสำเร็จ" />
+        <ToastOnParam param="deleted" message="ลบคำถามสำเร็จ" />
+      </Suspense>
+
       <FadeIn className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold-deep">
@@ -26,7 +61,7 @@ export default async function AdminFaqPage() {
               จัดการฐานความรู้ (FAQ)
             </h1>
             <p className="text-sm text-muted">
-              AI Chatbot จะตอบคำถามโดยอ้างอิงจากรายการนี้เท่านั้น ({faqs.length} รายการ)
+              AI Chatbot จะตอบคำถามโดยอ้างอิงจากรายการนี้เท่านั้น ({total} รายการ)
             </p>
           </div>
         </div>
@@ -39,8 +74,17 @@ export default async function AdminFaqPage() {
         </Link>
       </FadeIn>
 
+      <Suspense fallback={null}>
+        <SearchFilterBar searchPlaceholder="ค้นหาคำถามหรือคำตอบ..." />
+      </Suspense>
+
       {faqs.length === 0 ? (
-        <p className="text-sm text-muted">ยังไม่มีข้อมูลในฐานความรู้</p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <Mascot variant="faq" className="h-20 w-20" />
+          <p className="text-sm text-muted">
+            {q ? "ไม่พบรายการที่ตรงกับการค้นหา" : "ยังไม่มีข้อมูลในฐานความรู้"}
+          </p>
+        </div>
       ) : (
         <FadeIn delay={0.05}>
           <ul className="flex flex-col gap-3">
@@ -63,6 +107,10 @@ export default async function AdminFaqPage() {
           </ul>
         </FadeIn>
       )}
+
+      <Suspense fallback={null}>
+        <Pagination page={page} totalPages={totalPages} />
+      </Suspense>
 
       <Link href="/dashboard" className="text-sm text-muted underline">
         กลับไปแดชบอร์ด

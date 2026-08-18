@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bot, User, Send } from "lucide-react";
 import { askChatbot } from "@/app/actions/chatbot";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -34,7 +35,7 @@ export default function ChatbotPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
       <FadeIn className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold-deep">
           <Bot className="h-5 w-5" aria-hidden="true" />
@@ -51,7 +52,10 @@ export default function ChatbotPage() {
 
       <div className="flex flex-col gap-3">
         {messages.length === 0 && (
-          <p className="text-sm text-muted">ยังไม่มีการสนทนา ลองพิมพ์คำถามด้านล่างได้เลย</p>
+          <div className="flex flex-col items-center gap-2 py-6 text-center">
+            <Mascot variant="ai" className="h-20 w-20" />
+            <p className="text-sm text-muted">ยังไม่มีการสนทนา ลองพิมพ์คำถามด้านล่างได้เลย</p>
+          </div>
         )}
         {messages.map((m, i) => (
           <div

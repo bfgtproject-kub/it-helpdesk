@@ -1,8 +1,11 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
+import ToastOnParam from "@/components/ToastOnParam";
 
 const STATUS_LABEL: Record<string, string> = {
   OPEN: "รอดำเนินการ",
@@ -33,7 +36,12 @@ export default async function TicketDetailPage(
   if (ticket.createdById !== session?.user.id) redirect("/tickets");
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+      <Mascot variant="ticket" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+      <Suspense fallback={null}>
+        <ToastOnParam param="created" message="แจ้งปัญหาสำเร็จ" />
+      </Suspense>
+
       <FadeIn>
         <Link href="/tickets" className="text-sm text-muted underline">
           &larr; ตั๋วของฉัน

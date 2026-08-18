@@ -36,5 +36,5 @@ export async function createTicket(
 
   await classifyAndUpdateTicket(ticket.id, title, description);
 
-  redirect(`/tickets/${ticket.id}`);
+  redirect(`/tickets/${ticket.id}?created=1`);
 }

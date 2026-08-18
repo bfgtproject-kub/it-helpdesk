@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MessageCirclePlus } from "lucide-react";
 import { createFaqEntry } from "@/app/actions/admin-faq";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 
 export default function NewFaqPage() {
   const [question, setQuestion] = useState("");
@@ -32,7 +33,9 @@ export default function NewFaqPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+      <Mascot variant="faq" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+
       <FadeIn className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold-deep">
           <MessageCirclePlus className="h-5 w-5" aria-hidden="true" />

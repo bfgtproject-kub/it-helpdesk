@@ -1,10 +1,15 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Boxes, ScanLine, Plus, Package } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { Prisma, Role, AssetStatus } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
+import ToastOnParam from "@/components/ToastOnParam";
+import SearchFilterBar from "@/components/SearchFilterBar";
+import Pagination from "@/components/Pagination";
 import AssetStatusBadge from "@/components/AssetStatusBadge";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -14,16 +19,52 @@ const STATUS_LABEL: Record<string, string> = {
   RETIRED: "ปลดระวาง",
 };
 
-export default async function AdminAssetsPage() {
+const PAGE_SIZE = 10;
+
+export default async function AdminAssetsPage(props: PageProps<"/admin/assets">) {
   const session = await auth();
   if (!session?.user || session.user.role !== Role.ADMIN) {
     redirect("/dashboard");
   }
 
-  const assets = await prisma.asset.findMany({ orderBy: { createdAt: "desc" } });
+  const sp = await props.searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const status = typeof sp.status === "string" ? sp.status : "";
+  const page = Math.max(1, Number(sp.page) || 1);
+
+  const where: Prisma.AssetWhereInput = {
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { assetTag: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+    ...(status && Object.values(AssetStatus).includes(status as AssetStatus)
+      ? { status: status as AssetStatus }
+      : {}),
+  };
+
+  const [assets, total] = await Promise.all([
+    prisma.asset.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.asset.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const isFiltered = q !== "" || status !== "";
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+      <Suspense fallback={null}>
+        <ToastOnParam param="updated" message="บันทึกทรัพย์สินสำเร็จ" />
+        <ToastOnParam param="deleted" message="ลบทรัพย์สินสำเร็จ" />
+      </Suspense>
+
       <FadeIn className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold-deep">
@@ -31,7 +72,7 @@ export default async function AdminAssetsPage() {
           </div>
           <div>
             <h1 className="font-serif text-2xl font-semibold text-foreground">จัดการทรัพย์สิน</h1>
-            <p className="text-sm text-muted">ทั้งหมด {assets.length} รายการ</p>
+            <p className="text-sm text-muted">ทั้งหมด {total} รายการ</p>
           </div>
         </div>
         <div className="flex flex-shrink-0 gap-2">
@@ -52,8 +93,26 @@ export default async function AdminAssetsPage() {
         </div>
       </FadeIn>
 
+      <Suspense fallback={null}>
+        <SearchFilterBar
+          searchPlaceholder="ค้นหาชื่อหรือรหัสครุภัณฑ์..."
+          filters={[
+            {
+              param: "status",
+              label: "สถานะ",
+              options: Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label })),
+            },
+          ]}
+        />
+      </Suspense>
+
       {assets.length === 0 ? (
-        <p className="text-sm text-muted">ยังไม่มีทรัพย์สินในระบบ</p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <Mascot variant="asset" className="h-20 w-20" />
+          <p className="text-sm text-muted">
+            {isFiltered ? "ไม่พบรายการที่ตรงกับการค้นหา" : "ยังไม่มีทรัพย์สินในระบบ"}
+          </p>
+        </div>
       ) : (
         <FadeIn delay={0.05}>
           <ul className="flex flex-col gap-3">
@@ -77,6 +136,10 @@ export default async function AdminAssetsPage() {
           </ul>
         </FadeIn>
       )}
+
+      <Suspense fallback={null}>
+        <Pagination page={page} totalPages={totalPages} />
+      </Suspense>
 
       <Link href="/dashboard" className="text-sm text-muted underline">
         กลับไปแดชบอร์ด

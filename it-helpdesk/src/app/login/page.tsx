@@ -8,6 +8,7 @@ import { SplitText } from "gsap/SplitText";
 import { login } from "@/app/actions/auth";
 import Hero3D from "@/components/Hero3D";
 import TiltCard from "@/components/TiltCard";
+import Mascot from "@/components/Mascot";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(SplitText);
@@ -121,8 +122,12 @@ export default function LoginPage() {
   return (
     <main
       ref={rootRef}
-      className="mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4"
+      id="main-content"
+      tabIndex={-1}
+      className="relative mx-auto flex min-h-screen w-full max-w-sm flex-col items-center justify-center px-4"
     >
+      <Mascot variant="ai" className="pointer-events-none absolute right-2 bottom-[12%] h-16 w-16 sm:right-4" />
+
       <TiltCard className="flex w-full flex-col gap-6 rounded-2xl border border-gold/25 bg-card px-8 py-10 shadow-[0_25px_70px_-20px_rgba(176,141,87,0.35)]">
         <div className="flex flex-col items-center gap-3 text-center">
           <div ref={orbWrapperRef}>

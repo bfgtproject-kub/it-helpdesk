@@ -5,7 +5,11 @@
      deliberately not swapped by prefers-color-scheme. */
   --background: #faf6ed;
   --foreground: #2a2420;
-  --muted: #8b7f6e;
+  /* Darkened from the original #8b7f6e (~3.6:1 on --background, fails WCAG
+     AA's 4.5:1 text minimum) to the same hue at ~5.3:1 on --background,
+     ~5.7:1 on --card, ~4.7:1 on --gold-wash — clears AA against every
+     surface --muted text actually sits on in this app. */
+  --muted: #6f6557;
   --card: #fffefb;
   --gold: #b08d57;
   --gold-light: #d8c39c;

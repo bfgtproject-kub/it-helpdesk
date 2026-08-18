@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { AssetStatus, LoanStatus, Role } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 import AssetStatusBadge from "@/components/AssetStatusBadge";
 import { BorrowButton, ReturnButton } from "./LoanButton";
 
@@ -30,7 +31,7 @@ export default async function AssetsPage() {
   });
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
       <FadeIn className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold-deep">
           <Boxes className="h-5 w-5" aria-hidden="true" />
@@ -42,7 +43,10 @@ export default async function AssetsPage() {
       </FadeIn>
 
       {assets.length === 0 ? (
-        <p className="text-sm text-muted">ยังไม่มีทรัพย์สินในระบบ</p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <Mascot variant="asset" className="h-20 w-20" />
+          <p className="text-sm text-muted">ยังไม่มีทรัพย์สินในระบบ</p>
+        </div>
       ) : (
         <FadeIn delay={0.05}>
           <ul className="flex flex-col gap-3">

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
 import { claimTicket } from "@/app/actions/staff-tickets";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 import UpdateTicketForm from "../UpdateTicketForm";
 
 const SEVERITY_LABEL: Record<string, string> = {
@@ -41,7 +42,9 @@ export default async function StaffTicketDetailPage(
   const claimWithId = claimTicket.bind(null, ticket.id);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4 py-12">
+      <Mascot variant="ticket" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+
       <FadeIn>
         <Link href="/staff/tickets" className="text-sm text-muted underline">
           &larr; Ticket ทั้งหมด

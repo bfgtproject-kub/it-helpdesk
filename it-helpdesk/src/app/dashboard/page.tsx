@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  UserRound,
   Ticket as TicketIcon,
   BarChart3,
   Plus,
@@ -11,6 +10,7 @@ import {
   ShieldCheck,
   BookOpen,
   LogOut,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 import { auth, signOut } from "@/auth";
@@ -19,7 +19,8 @@ import { Role, TicketStatus } from "@/generated/prisma/client";
 import TicketStatusBars from "./TicketStatusBars";
 import TrendSummaryButton from "./TrendSummaryButton";
 import FadeIn from "@/components/FadeIn";
-import GrainOverlay from "@/components/GrainOverlay";
+import Mascot from "@/components/Mascot";
+import UserAvatar from "@/components/UserAvatar";
 
 const ROLE_LABEL: Record<string, string> = {
   USER: "ผู้ใช้งานทั่วไป",
@@ -99,8 +100,8 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <GrainOverlay />
-      <main className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-12">
+      <Mascot variant="ai" className="pointer-events-none fixed bottom-4 right-4 z-0 hidden h-16 w-16 sm:block" />
+      <main id="main-content" tabIndex={-1} className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-12">
         <FadeIn>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold-deep">
             IT Helpdesk &amp; Asset Management
@@ -115,16 +116,21 @@ export default async function DashboardPage() {
             delay={0.05}
             className="flex items-center gap-4 rounded-2xl border border-gold/25 bg-card p-6 shadow-[0_1px_2px_rgba(176,141,87,0.06),0_10px_28px_-14px_rgba(176,141,87,0.35)] sm:col-span-4"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold-wash text-gold">
-              <UserRound className="h-6 w-6" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
+            <UserAvatar name={user?.name ?? "?"} image={user?.image} size="md" />
+            <div className="min-w-0 flex-1">
               <p className="truncate text-base font-semibold text-foreground">{user?.name}</p>
               <p className="truncate text-sm text-muted">{user?.email}</p>
               <span className="mt-1.5 inline-block rounded-full bg-gold-wash px-2.5 py-0.5 text-xs font-medium text-gold-deep">
                 {user?.role ? ROLE_LABEL[user.role] : "-"}
               </span>
             </div>
+            <Link
+              href="/settings"
+              aria-label="ตั้งค่าบัญชี"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors duration-150 hover:bg-gold-wash hover:text-gold-deep"
+            >
+              <Settings className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </FadeIn>
 
           <FadeIn

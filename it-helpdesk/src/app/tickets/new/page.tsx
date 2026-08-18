@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { createTicket } from "@/app/actions/tickets";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 
 export default function NewTicketPage() {
   const [title, setTitle] = useState("");
@@ -32,7 +33,9 @@ export default function NewTicketPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center gap-6 px-4">
+      <Mascot variant="ticket" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+
       <FadeIn>
         <h1 className="font-serif text-2xl font-semibold text-foreground">แจ้งปัญหาใหม่</h1>
         <p className="text-sm text-muted">

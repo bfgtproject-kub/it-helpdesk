@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import Hero3D from "@/components/Hero3D";
 import TiltCard from "@/components/TiltCard";
+import Mascot from "@/components/Mascot";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -97,11 +98,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} id="main-content" tabIndex={-1}>
       <section
         ref={heroSectionRef}
-        className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center"
+        className="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center"
       >
+        <Mascot variant="ai" className="pointer-events-none absolute bottom-[10%] right-[6%] h-20 w-20 sm:right-[12%] sm:h-28 sm:w-28" />
+
         <div ref={orbWrapperRef}>
           <TiltCard>
             <Hero3D className="h-32 w-32 sm:h-40 sm:w-40" />

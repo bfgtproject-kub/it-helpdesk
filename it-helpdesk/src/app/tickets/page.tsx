@@ -1,7 +1,12 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma, TicketStatus } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
+import SearchFilterBar from "@/components/SearchFilterBar";
+import Pagination from "@/components/Pagination";
 
 const STATUS_LABEL: Record<string, string> = {
   OPEN: "รอดำเนินการ",
@@ -17,20 +22,43 @@ const SEVERITY_LABEL: Record<string, string> = {
   HIGH: "สูง",
 };
 
-export default async function TicketsPage() {
+const PAGE_SIZE = 10;
+
+export default async function TicketsPage(props: PageProps<"/tickets">) {
   const session = await auth();
-  const tickets = await prisma.ticket.findMany({
-    where: { createdById: session!.user.id },
-    orderBy: { createdAt: "desc" },
-    include: { category: true },
-  });
+
+  const sp = await props.searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const status = typeof sp.status === "string" ? sp.status : "";
+  const page = Math.max(1, Number(sp.page) || 1);
+
+  const where: Prisma.TicketWhereInput = {
+    createdById: session!.user.id,
+    ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
+    ...(status && Object.values(TicketStatus).includes(status as TicketStatus)
+      ? { status: status as TicketStatus }
+      : {}),
+  };
+
+  const [tickets, total] = await Promise.all([
+    prisma.ticket.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: { category: true },
+    }),
+    prisma.ticket.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const isFiltered = q !== "" || status !== "";
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-4 py-12">
       <FadeIn className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-2xl font-semibold text-foreground">ตั๋วของฉัน</h1>
-          <p className="text-sm text-muted">รายการแจ้งปัญหาที่คุณส่งเข้ามา</p>
+          <p className="text-sm text-muted">ทั้งหมด {total} รายการ</p>
         </div>
         <Link
           href="/tickets/new"
@@ -40,8 +68,26 @@ export default async function TicketsPage() {
         </Link>
       </FadeIn>
 
+      <Suspense fallback={null}>
+        <SearchFilterBar
+          searchPlaceholder="ค้นหาหัวข้อ..."
+          filters={[
+            {
+              param: "status",
+              label: "สถานะ",
+              options: Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label })),
+            },
+          ]}
+        />
+      </Suspense>
+
       {tickets.length === 0 ? (
-        <p className="text-sm text-muted">ยังไม่มีรายการแจ้งปัญหา</p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <Mascot variant="ticket" className="h-20 w-20" />
+          <p className="text-sm text-muted">
+            {isFiltered ? "ไม่พบรายการที่ตรงกับการค้นหา" : "ยังไม่มีรายการแจ้งปัญหา"}
+          </p>
+        </div>
       ) : (
         <FadeIn delay={0.05}>
           <ul className="flex flex-col gap-3">
@@ -66,6 +112,10 @@ export default async function TicketsPage() {
           </ul>
         </FadeIn>
       )}
+
+      <Suspense fallback={null}>
+        <Pagination page={page} totalPages={totalPages} />
+      </Suspense>
 
       <Link href="/dashboard" className="text-sm text-muted underline">
         กลับไปแดชบอร์ด

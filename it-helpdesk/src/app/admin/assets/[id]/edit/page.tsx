@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -6,6 +7,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
+import ToastOnParam from "@/components/ToastOnParam";
 import AssetEditForm from "../../AssetEditForm";
 
 export default async function EditAssetPage(
@@ -29,7 +32,12 @@ export default async function EditAssetPage(
   });
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4 py-12">
+      <Mascot variant="asset" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+      <Suspense fallback={null}>
+        <ToastOnParam param="created" message="เพิ่มทรัพย์สินสำเร็จ" />
+      </Suspense>
+
       <FadeIn>
         <Link href="/admin/assets" className="text-sm text-muted underline">
           &larr; ทรัพย์สินทั้งหมด

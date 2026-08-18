@@ -4,6 +4,7 @@ import { ScanLine } from "lucide-react";
 import { auth } from "@/auth";
 import { Role } from "@/generated/prisma/client";
 import FadeIn from "@/components/FadeIn";
+import Mascot from "@/components/Mascot";
 import AssetOcrForm from "./AssetOcrForm";
 
 export default async function AssetOcrPage() {
@@ -13,7 +14,9 @@ export default async function AssetOcrPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="relative mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4 py-12">
+      <Mascot variant="asset" className="pointer-events-none fixed bottom-4 right-4 hidden h-16 w-16 sm:block sm:bottom-6 sm:right-6" />
+
       <FadeIn>
         <Link href="/admin/assets" className="text-sm text-muted underline">
           &larr; ทรัพย์สินทั้งหมด

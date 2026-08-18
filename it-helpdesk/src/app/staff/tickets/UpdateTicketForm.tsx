@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { updateTicket } from "@/app/actions/staff-tickets";
+import { useToast } from "@/components/ToastProvider";
 
 const STATUS_OPTIONS = [
   { value: "OPEN", label: "รอดำเนินการ" },
@@ -22,8 +23,8 @@ export default function UpdateTicketForm({
   const [status, setStatus] = useState(currentStatus);
   const [resolution, setResolution] = useState(currentResolution);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
+  const { showToast } = useToast();
 
   // Deliberately not a <form action={...}> — React 19 resets uncontrolled
   // (and even controlled, since the reset happens outside React's own
@@ -35,7 +36,6 @@ export default function UpdateTicketForm({
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
 
     startTransition(async () => {
       const formData = new FormData();
@@ -46,7 +46,7 @@ export default function UpdateTicketForm({
         setError(result.error);
         return;
       }
-      setSuccess(true);
+      showToast("บันทึกตั๋วเรียบร้อย");
     });
   }
 
@@ -81,7 +81,6 @@ export default function UpdateTicketForm({
       </label>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {success && <p className="text-sm text-green-600">บันทึกเรียบร้อย</p>}
 
       <button
         type="submit"

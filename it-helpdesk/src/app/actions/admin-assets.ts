@@ -49,7 +49,7 @@ export async function createAsset(
   revalidatePath("/admin/assets");
   // Land on the edit page (not the list) so the admin sees the generated
   // QR code immediately, ready to print/download.
-  redirect(`/admin/assets/${asset.id}/edit`);
+  redirect(`/admin/assets/${asset.id}/edit?created=1`);
 }
 
 export async function updateAsset(
@@ -80,12 +80,12 @@ export async function updateAsset(
   });
 
   revalidatePath("/admin/assets");
-  redirect("/admin/assets");
+  redirect("/admin/assets?updated=1");
 }
 
 export async function deleteAsset(assetId: string, _formData: FormData) {
   await requireAdmin();
   await prisma.asset.delete({ where: { id: assetId } });
   revalidatePath("/admin/assets");
-  redirect("/admin/assets");
+  redirect("/admin/assets?deleted=1");
 }

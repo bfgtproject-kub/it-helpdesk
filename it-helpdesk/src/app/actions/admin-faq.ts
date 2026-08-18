@@ -35,7 +35,7 @@ export async function createFaqEntry(
   await prisma.faqEntry.create({ data: { question, answer } });
 
   revalidatePath("/admin/faq");
-  redirect("/admin/faq");
+  redirect("/admin/faq?created=1");
 }
 
 export async function updateFaqEntry(
@@ -61,12 +61,12 @@ export async function updateFaqEntry(
   });
 
   revalidatePath("/admin/faq");
-  redirect("/admin/faq");
+  redirect("/admin/faq?updated=1");
 }
 
 export async function deleteFaqEntry(faqId: string, _formData: FormData) {
   await requireAdmin();
   await prisma.faqEntry.delete({ where: { id: faqId } });
   revalidatePath("/admin/faq");
-  redirect("/admin/faq");
+  redirect("/admin/faq?deleted=1");
 }
