@@ -11,6 +11,7 @@ import SearchFilterBar from "@/components/SearchFilterBar";
 import Pagination from "@/components/Pagination";
 import UserAvatar from "@/components/UserAvatar";
 import RoleForm from "./RoleForm";
+import ResetPasswordButton from "./ResetPasswordButton";
 
 const ROLE_LABEL: Record<string, string> = {
   USER: "ผู้ใช้งานทั่วไป",
@@ -95,20 +96,23 @@ export default async function AdminUsersPage(props: PageProps<"/admin/users">) {
             {users.map((u) => (
               <li
                 key={u.id}
-                className="flex items-center justify-between gap-4 rounded-lg border border-gold/25 bg-card p-4 text-sm"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-card p-4 text-sm shadow-neu"
               >
-                <div className="flex min-w-0 items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                   <UserAvatar name={u.name} image={u.image} size="sm" />
                   <div className="min-w-0">
                     <p className="truncate font-medium text-foreground">{u.name}</p>
                     <p className="truncate text-muted">{u.email}</p>
                   </div>
                 </div>
-                <RoleForm
-                  userId={u.id}
-                  currentRole={u.role}
-                  disabled={u.id === session.user.id}
-                />
+                <div className="flex shrink-0 items-start gap-3">
+                  <ResetPasswordButton userId={u.id} userName={u.name} />
+                  <RoleForm
+                    userId={u.id}
+                    currentRole={u.role}
+                    disabled={u.id === session.user.id}
+                  />
+                </div>
               </li>
             ))}
           </ul>
